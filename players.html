@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registered Players — SRA Tournament</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .page-header { padding: 48px 0 0; margin-bottom: 36px; }
+
+  .page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 80px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+
+  .page-title span { color: var(--purple); }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-top: 3px solid var(--purple);
+    padding: 16px 24px;
+    min-width: 120px;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Search / filter */
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-bottom: 2px solid var(--purple-dark);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 10px 16px 10px 36px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--purple); }
+  .search-wrap input::placeholder { color: rgba(255,255,255,0.2); }
+
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 18px;
+    pointer-events: none;
+  }
+
+  .filter-select {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-bottom: 2px solid var(--purple-dark);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 10px 32px 10px 14px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--purple-light);
+    pointer-events: none;
+  }
+
+  /* Table */
+  .table-wrap {
+    border: 1px solid var(--card-border);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: var(--card);
+    border-bottom: 2px solid var(--purple);
+  }
+
+  thead th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--purple-light);
+    padding: 14px 20px;
+    text-align: left;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--card-border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(124,58,237,0.05); }
+
+  tbody td {
+    padding: 14px 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: 0.5px;
+  }
+
+  .player-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--purple);
+    width: 40px;
+  }
+
+  .grade-badge {
+    display: inline-block;
+    background: #110d1e;
+    border: 1px solid var(--card-border);
+    padding: 2px 8px;
+    font-size: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .game-chip {
+    display: inline-block;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: var(--purple-light);
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    margin: 2px 2px 2px 0;
+  }
+
+  /* Loading / empty states */
+  .state-box {
+    padding: 60px 20px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+  }
+
+  .state-box .icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .state-box p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--card-border);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .refresh-btn {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    margin-left: auto;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .refresh-btn:hover { border-color: var(--purple); color: var(--white); }
+
+  .last-updated {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.15);
+    text-align: right;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">SRA <span>×</span> ESPORTS</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="players.html" class="active">Players</a>
+    <a href="signup.html" class="cta">Sign Up</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-header fade-up">
+    <div class="presents-tag">Student Repair Academy Presents</div>
+    <div class="page-title">Registered <span>Players</span></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row fade-up-2">
+    <div class="stat-box">
+      <div class="stat-num" id="total-count">--</div>
+      <div class="stat-label">Total Registered</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="grade-count">--</div>
+      <div class="stat-label">Grades Represented</div>
+    </div>
+  </div>
+
+  <div class="divider fade-up-2"></div>
+
+  <!-- Controls -->
+  <div class="controls fade-up-3">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search by name or teacher..." oninput="filterTable()">
+    </div>
+    <div class="select-wrap">
+      <select class="filter-select" id="gradeFilter" onchange="filterTable()">
+        <option value="">All Grades</option>
+        <option value="9">9th Grade</option>
+        <option value="10">10th Grade</option>
+        <option value="11">11th Grade</option>
+        <option value="12">12th Grade</option>
+      </select>
+    </div>
+    <button class="refresh-btn" onclick="loadPlayers()">↻ Refresh</button>
+  </div>
+
+  <!-- Table -->
+  <div id="content" class="fade-up-3">
+    <div class="state-box" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading registered players...</p>
+    </div>
+  </div>
+
+  <div class="last-updated" id="lastUpdated"></div>
+
+</div>
+
+<footer class="site-footer">
+  Student Repair Academy · Foundation Collegiate Academy Esports League · 2025–26
+</footer>
+
+<script>
+  const SHEET_ID = '13v4vQWtfI6nMvqL5BgqqOWVer8HJgDAQBhRl760uthE';
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Form%20Responses%201`;
+
+  let allPlayers = [];
+
+  async function loadPlayers() {
+    document.getElementById('content').innerHTML = `
+      <div class="state-box" id="loadingState">
+        <div class="spinner"></div>
+        <p>Loading registered players...</p>
+      </div>`;
+
+    try {
+      const res = await fetch(SHEET_URL);
+      const text = await res.text();
+
+      // Google wraps response in /*O_o*/ google.visualization.Query.setResponse({...});
+      const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+      const rows = json.table.rows;
+
+      if (!rows || rows.length === 0) {
+        document.getElementById('content').innerHTML = `
+          <div class="state-box">
+            <span class="icon">🎮</span>
+            <p>No players registered yet. Be the first!</p>
+          </div>`;
+        updateStats([]);
+        return;
+      }
+
+      // cols: 0=Timestamp, 1=Full Name, 2=Grade, 3=Teacher, 4=Game Preference
+      allPlayers = rows.map((row, i) => ({
+        num: i + 1,
+        name: row.c[1]?.v || '—',
+        grade: row.c[2]?.v || '—',
+        teacher: row.c[3]?.v || '—',
+        games: row.c[4]?.v || '—',
+        timestamp: row.c[0]?.v || ''
+      }));
+
+      renderTable(allPlayers);
+      updateStats(allPlayers);
+
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent =
+        `Last updated: ${now.toLocaleTimeString()}`;
+
+    } catch(e) {
+      document.getElementById('content').innerHTML = `
+        <div class="state-box">
+          <span class="icon">⚠️</span>
+          <p>Couldn't load players. Make sure the sheet is set to public viewer access.</p>
+        </div>`;
+    }
+  }
+
+  function renderTable(players) {
+    if (players.length === 0) {
+      document.getElementById('content').innerHTML = `
+        <div class="state-box">
+          <span class="icon">🔍</span>
+          <p>No players match your search.</p>
+        </div>`;
+      return;
+    }
+
+    const rows = players.map(p => {
+      const games = p.games.split(',').map(g => g.trim()).filter(Boolean);
+      const gameChips = games.map(g => `<span class="game-chip">${g}</span>`).join('');
+      return `
+        <tr>
+          <td class="player-num">${String(p.num).padStart(2,'0')}</td>
+          <td>${p.name}</td>
+          <td><span class="grade-badge">${p.grade}th</span></td>
+          <td>${p.teacher}</td>
+          <td>${gameChips}</td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('content').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Grade</th>
+              <th>4th Period Teacher</th>
+              <th>Game Preference</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const grade = document.getElementById('gradeFilter').value;
+
+    const filtered = allPlayers.filter(p => {
+      const matchSearch = !search ||
+        p.name.toLowerCase().includes(search) ||
+        p.teacher.toLowerCase().includes(search);
+      const matchGrade = !grade || String(p.grade) === grade;
+      return matchSearch && matchGrade;
+    });
+
+    renderTable(filtered);
+  }
+
+  function updateStats(players) {
+    document.getElementById('total-count').textContent =
+      String(players.length).padStart(2, '0');
+    const grades = new Set(players.map(p => p.grade));
+    document.getElementById('grade-count').textContent =
+      String(grades.size).padStart(2, '0');
+  }
+
+  loadPlayers();
+  // Auto-refresh every 60 seconds
+  setInterval(loadPlayers, 60000);
+</script>
+</body>
+</html>
