@@ -251,6 +251,48 @@
     text-align: right;
     margin-top: 10px;
   }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--card-border);
+  }
+
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tab-btn:hover { color: var(--white); }
+
+  .tab-btn.active {
+    color: var(--purple-light);
+    border-bottom-color: var(--purple);
+  }
+
+  .rep-badge {
+    display: inline-block;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: var(--purple-light);
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+  }
 </style>
 </head>
 <body>
@@ -274,21 +316,35 @@
   <!-- Stats -->
   <div class="stats-row fade-up-2">
     <div class="stat-box">
-      <div class="stat-num" id="total-count">--</div>
-      <div class="stat-label">Total Registered</div>
+      <div class="stat-num" id="confirmed-count">--</div>
+      <div class="stat-label">Confirmed</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="pending-count">--</div>
+      <div class="stat-label">Pending</div>
     </div>
     <div class="stat-box">
       <div class="stat-num" id="grade-count">--</div>
-      <div class="stat-label">Grades Represented</div>
+      <div class="stat-label">Grades</div>
     </div>
   </div>
 
   <div class="divider fade-up-2"></div>
 
+  <!-- Tabs -->
+  <div class="tabs fade-up-3">
+    <button class="tab-btn active" id="tab-confirmed" onclick="switchTab('confirmed')">
+      ✓ Confirmed Players
+    </button>
+    <button class="tab-btn" id="tab-pending" onclick="switchTab('pending')">
+      ⏳ Pending Review
+    </button>
+  </div>
+
   <!-- Controls -->
   <div class="controls fade-up-3">
     <div class="search-wrap">
-      <input type="text" id="searchInput" placeholder="Search by name or teacher..." oninput="filterTable()">
+      <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterTable()">
     </div>
     <div class="select-wrap">
       <select class="filter-select" id="gradeFilter" onchange="filterTable()">
@@ -299,14 +355,14 @@
         <option value="12">12th Grade</option>
       </select>
     </div>
-    <button class="refresh-btn" onclick="loadPlayers()">↻ Refresh</button>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
   </div>
 
   <!-- Table -->
   <div id="content" class="fade-up-3">
     <div class="state-box" id="loadingState">
       <div class="spinner"></div>
-      <p>Loading registered players...</p>
+      <p>Loading players...</p>
     </div>
   </div>
 
@@ -320,96 +376,118 @@
 
 <script>
   const SHEET_ID = '13v4vQWtfI6nMvqL5BgqqOWVer8HJgDAQBhRl760uthE';
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Form%20Responses%201`;
 
-  let allPlayers = [];
+  const SHEETS = {
+    pending: `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Form%20Responses%201`,
+    confirmed: `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Confirmed%20Players`
+  };
 
-  async function loadPlayers() {
-    document.getElementById('content').innerHTML = `
-      <div class="state-box" id="loadingState">
-        <div class="spinner"></div>
-        <p>Loading registered players...</p>
-      </div>`;
+  let allPending = [];
+  let allConfirmed = [];
+  let currentTab = 'confirmed';
 
-    try {
-      const res = await fetch(SHEET_URL);
-      const text = await res.text();
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-confirmed').classList.toggle('active', tab === 'confirmed');
+    document.getElementById('tab-pending').classList.toggle('active', tab === 'pending');
+    document.getElementById('searchInput').value = '';
+    document.getElementById('gradeFilter').value = '';
+    renderTable(tab === 'confirmed' ? allConfirmed : allPending, tab);
+  }
 
-      // Google wraps response in /*O_o*/ google.visualization.Query.setResponse({...});
-      const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
-      const rows = json.table.rows;
+  async function fetchSheet(url, type) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+    const rows = json.table.rows || [];
 
-      if (!rows || rows.length === 0) {
-        document.getElementById('content').innerHTML = `
-          <div class="state-box">
-            <span class="icon">🎮</span>
-            <p>No players registered yet. Be the first!</p>
-          </div>`;
-        updateStats([]);
-        return;
-      }
-
+    if (type === 'confirmed') {
+      // cols: 0=Full Name, 1=Grade, 2=Representing
+      return rows.map((row, i) => ({
+        num: i + 1,
+        name: row.c[0]?.v || '—',
+        grade: row.c[1]?.v || '—',
+        representing: row.c[2]?.v || '—'
+      }));
+    } else {
       // cols: 0=Timestamp, 1=Full Name, 2=Grade, 3=Teacher, 4=Game Preference
-      allPlayers = rows.map((row, i) => ({
+      return rows.map((row, i) => ({
         num: i + 1,
         name: row.c[1]?.v || '—',
         grade: row.c[2]?.v || '—',
-        teacher: row.c[3]?.v || '—',
-        games: row.c[4]?.v || '—',
-        timestamp: row.c[0]?.v || ''
+        games: row.c[4]?.v || '—'
       }));
+    }
+  }
 
-      renderTable(allPlayers);
-      updateStats(allPlayers);
+  async function loadAll() {
+    document.getElementById('content').innerHTML = `
+      <div class="state-box">
+        <div class="spinner"></div>
+        <p>Loading players...</p>
+      </div>`;
+
+    try {
+      [allConfirmed, allPending] = await Promise.all([
+        fetchSheet(SHEETS.confirmed, 'confirmed'),
+        fetchSheet(SHEETS.pending, 'pending')
+      ]);
+
+      updateStats();
+      renderTable(currentTab === 'confirmed' ? allConfirmed : allPending, currentTab);
 
       const now = new Date();
       document.getElementById('lastUpdated').textContent =
         `Last updated: ${now.toLocaleTimeString()}`;
-
     } catch(e) {
       document.getElementById('content').innerHTML = `
         <div class="state-box">
           <span class="icon">⚠️</span>
-          <p>Couldn't load players. Make sure the sheet is set to public viewer access.</p>
+          <p>Couldn't load players. Make sure the sheet is public.</p>
         </div>`;
     }
   }
 
-  function renderTable(players) {
-    if (players.length === 0) {
+  function renderTable(players, type) {
+    if (!players || players.length === 0) {
       document.getElementById('content').innerHTML = `
         <div class="state-box">
-          <span class="icon">🔍</span>
-          <p>No players match your search.</p>
+          <span class="icon">${type === 'confirmed' ? '🏆' : '🎮'}</span>
+          <p>${type === 'confirmed' ? 'No confirmed players yet.' : 'No pending registrations.'}</p>
         </div>`;
       return;
     }
 
-    const rows = players.map(p => {
-      const games = p.games.split(',').map(g => g.trim()).filter(Boolean);
-      const gameChips = games.map(g => `<span class="game-chip">${g}</span>`).join('');
-      return `
+    let headers, rows;
+
+    if (type === 'confirmed') {
+      headers = `<th>#</th><th>Name</th><th>Grade</th><th>Representing</th>`;
+      rows = players.map(p => `
         <tr>
           <td class="player-num">${String(p.num).padStart(2,'0')}</td>
           <td>${p.name}</td>
           <td><span class="grade-badge">${p.grade}th</span></td>
-          <td>${p.teacher}</td>
-          <td>${gameChips}</td>
+          <td><span class="rep-badge">${p.representing}</span></td>
+        </tr>`).join('');
+    } else {
+      headers = `<th>#</th><th>Name</th><th>Grade</th><th>Game Preference</th>`;
+      rows = players.map(p => {
+        const games = p.games.split(',').map(g => g.trim()).filter(Boolean);
+        const chips = games.map(g => `<span class="game-chip">${g}</span>`).join('');
+        return `
+        <tr>
+          <td class="player-num">${String(p.num).padStart(2,'0')}</td>
+          <td>${p.name}</td>
+          <td><span class="grade-badge">${p.grade}th</span></td>
+          <td>${chips}</td>
         </tr>`;
-    }).join('');
+      }).join('');
+    }
 
     document.getElementById('content').innerHTML = `
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Grade</th>
-              <th>4th Period Teacher</th>
-              <th>Game Preference</th>
-            </tr>
-          </thead>
+          <thead><tr>${headers}</tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -418,29 +496,29 @@
   function filterTable() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const grade = document.getElementById('gradeFilter').value;
+    const source = currentTab === 'confirmed' ? allConfirmed : allPending;
 
-    const filtered = allPlayers.filter(p => {
-      const matchSearch = !search ||
-        p.name.toLowerCase().includes(search) ||
-        p.teacher.toLowerCase().includes(search);
+    const filtered = source.filter(p => {
+      const matchSearch = !search || p.name.toLowerCase().includes(search);
       const matchGrade = !grade || String(p.grade) === grade;
       return matchSearch && matchGrade;
     });
 
-    renderTable(filtered);
+    renderTable(filtered, currentTab);
   }
 
-  function updateStats(players) {
-    document.getElementById('total-count').textContent =
-      String(players.length).padStart(2, '0');
-    const grades = new Set(players.map(p => p.grade));
+  function updateStats() {
+    document.getElementById('confirmed-count').textContent =
+      String(allConfirmed.length).padStart(2, '0');
+    document.getElementById('pending-count').textContent =
+      String(allPending.length).padStart(2, '0');
+    const grades = new Set([...allConfirmed, ...allPending].map(p => p.grade));
     document.getElementById('grade-count').textContent =
       String(grades.size).padStart(2, '0');
   }
 
-  loadPlayers();
-  // Auto-refresh every 60 seconds
-  setInterval(loadPlayers, 60000);
+  loadAll();
+  setInterval(loadAll, 60000);
 </script>
 </body>
 </html>
