@@ -3,112 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SRA Tournament — Sign Up</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<title>SRA × Esports — End-of-Year Tournament</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --black: #0a0a0a;
-    --purple: #7c3aed;
-    --purple-light: #a78bfa;
-    --purple-dark: #5b21b6;
-    --purple-glow: rgba(124,58,237,0.25);
-    --card: #1a1625;
-    --card-border: #2a2040;
-    --white: #f5f5f0;
-    --muted: rgba(245,245,240,0.4);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Barlow', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Glow orb */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 60px 24px 80px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Header */
-  .header {
-    margin-bottom: 48px;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .presents-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-left: 3px solid var(--purple);
-    padding: 6px 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-
-  .presents-tag::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--purple);
-    animation: pulse 2s ease infinite;
-  }
+  .hero { padding: 60px 0 20px; }
 
   .main-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 80px;
-    line-height: 0.9;
+    font-size: clamp(64px, 10vw, 110px);
+    line-height: 0.88;
     letter-spacing: 2px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
-  .main-title .line1 { color: var(--white); }
-  .main-title .line2 { color: var(--purple); }
-  .main-title .line3 {
-    -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
+  .main-title .l1 { color: var(--white); display: block; }
+  .main-title .l2 { color: var(--purple); display: block; }
+  .main-title .l3 {
+    -webkit-text-stroke: 1.5px rgba(255,255,255,0.1);
     color: transparent;
-    font-size: 96px;
+    display: block;
+    font-size: clamp(72px, 12vw, 130px);
     letter-spacing: -1px;
   }
 
@@ -117,54 +31,68 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 24px;
   }
 
-  .badge {
+  /* Countdown */
+  .countdown-section {
+    margin: 48px 0;
+  }
+
+  .countdown-label {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    padding: 4px 10px;
+    color: var(--purple-light);
+    margin-bottom: 16px;
   }
 
-  .badge-purple { background: var(--purple); color: white; }
-  .badge-outline {
-    border: 1px solid var(--card-border);
-    color: var(--muted);
+  .countdown {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .countdown-unit {
     background: var(--card);
+    border: 1px solid var(--card-border);
+    border-top: 3px solid var(--purple);
+    padding: 20px 24px;
+    text-align: center;
+    min-width: 90px;
+    flex: 1;
   }
 
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, var(--purple), transparent);
-    margin: 36px 0;
-    position: relative;
-    animation: fadeUp 0.6s 0.2s ease both;
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: 2px;
   }
 
-  .divider::before {
-    content: '▶';
-    position: absolute;
-    left: 0; top: -7px;
-    color: var(--purple);
-    font-size: 13px;
+  .countdown-unit-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
   }
 
-  /* Event info strip */
-  .info-strip {
+  /* Info grid */
+  .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     border: 1px solid var(--card-border);
     border-left: 3px solid var(--purple);
     background: var(--card);
-    margin-bottom: 40px;
-    animation: fadeUp 0.6s 0.3s ease both;
+    margin-bottom: 48px;
   }
 
   .info-item {
-    padding: 20px;
+    padding: 24px;
     border-right: 1px solid var(--card-border);
   }
 
@@ -176,499 +104,285 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--purple-light);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   .info-value {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     letter-spacing: 1px;
     color: var(--white);
     line-height: 1.1;
   }
 
   .info-sub {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 3px;
     font-family: 'Barlow Condensed', sans-serif;
   }
 
-  /* Form */
-  .form-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-top: 3px solid var(--purple);
-    padding: 36px;
-    animation: fadeUp 0.6s 0.4s ease both;
-  }
-
-  .form-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--white);
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .form-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--card-border);
-  }
-
-  .field-group {
-    margin-bottom: 24px;
-  }
-
-  label {
-    display: block;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--purple-light);
-    margin-bottom: 8px;
-  }
-
-  input[type="text"],
-  select {
-    width: 100%;
-    background: #110d1e;
-    border: 1px solid var(--card-border);
-    border-bottom: 2px solid var(--purple-dark);
-    color: var(--white);
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px;
-    padding: 12px 16px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  input[type="text"]:focus,
-  select:focus {
-    border-color: var(--purple);
-    border-bottom-color: var(--purple);
-    box-shadow: 0 4px 20px rgba(124,58,237,0.15);
-  }
-
-  input[type="text"]::placeholder { color: rgba(255,255,255,0.2); }
-
-  .select-wrap {
-    position: relative;
-  }
-
-  .select-wrap::after {
-    content: '▾';
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--purple-light);
-    pointer-events: none;
-    font-size: 16px;
-  }
-
-  select option { background: #1a1625; }
-
-  /* Checkbox group */
-  .checkbox-group {
+  /* About section */
+  .about-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 16px;
+    margin-bottom: 48px;
   }
 
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #110d1e;
+  .about-card {
+    background: var(--card);
     border: 1px solid var(--card-border);
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    user-select: none;
-  }
-
-  .checkbox-item:hover {
-    border-color: var(--purple-dark);
-    background: #1a1230;
-  }
-
-  .checkbox-item input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border: 2px solid var(--purple-dark);
-    background: transparent;
-    cursor: pointer;
-    flex-shrink: 0;
-    position: relative;
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  .checkbox-item input[type="checkbox"]:checked {
-    background: var(--purple);
-    border-color: var(--purple);
-  }
-
-  .checkbox-item input[type="checkbox"]:checked::after {
-    content: '✓';
-    position: absolute;
-    top: -2px; left: 1px;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-  }
-
-  .checkbox-item:has(input:checked) {
-    border-color: var(--purple);
-    background: rgba(124,58,237,0.08);
-  }
-
-  .checkbox-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--white);
-  }
-
-  .checkbox-item .game-icon {
-    font-size: 18px;
-  }
-
-  /* Notice */
-  .notice {
-    background: rgba(124,58,237,0.07);
     border-left: 3px solid var(--purple);
-    padding: 12px 16px;
-    margin-bottom: 28px;
+    padding: 24px;
+  }
+
+  .about-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
     font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--purple-light);
+    margin-bottom: 10px;
+  }
+
+  .about-card p {
+    font-size: 14px;
     color: var(--muted);
-    line-height: 1.5;
+    line-height: 1.6;
     font-family: 'Barlow Condensed', sans-serif;
     letter-spacing: 0.5px;
   }
 
-  .notice strong { color: var(--purple-light); }
-
-  /* Submit */
-  .submit-btn {
-    width: 100%;
-    background: var(--purple);
-    color: white;
-    border: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 3px;
-    padding: 16px;
-    cursor: pointer;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
+  /* CTA */
+  .cta-block {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-top: 3px solid var(--purple);
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
   }
 
-  .submit-btn:hover {
+  .cta-block .left h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .cta-block .left h2 span { color: var(--purple); }
+
+  .cta-block .left p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    background: var(--purple);
+    color: white;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    padding: 16px 36px;
+    text-decoration: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: background 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+
+  .cta-btn:hover {
     background: var(--purple-dark);
     box-shadow: 0 0 30px rgba(124,58,237,0.4);
   }
 
-  .submit-btn:active { transform: scale(0.99); }
-
-  .submit-btn.loading {
-    pointer-events: none;
-    opacity: 0.7;
+  /* Games list */
+  .games-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
   }
 
-  /* Success state */
-  .success-screen {
-    display: none;
-    text-align: center;
-    padding: 60px 20px;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  .success-screen.show { display: block; }
-  .form-card.hidden { display: none; }
-
-  .success-icon {
-    width: 64px; height: 64px;
-    background: var(--purple);
-    border-radius: 50%;
+  .game-tag {
+    background: #110d1e;
+    border: 1px solid var(--card-border);
+    padding: 10px 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--white);
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 24px;
-    font-size: 28px;
-    box-shadow: 0 0 40px rgba(124,58,237,0.4);
+    gap: 8px;
   }
 
-  .success-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    color: var(--white);
-    letter-spacing: 2px;
-    line-height: 1;
-    margin-bottom: 12px;
-  }
-
-  .success-title span { color: var(--purple); }
-
-  .success-body {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    color: var(--muted);
+  .game-tag .pending {
+    font-size: 10px;
+    color: var(--purple-light);
     letter-spacing: 1px;
-    line-height: 1.6;
   }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 48px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.15);
-  }
-
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Error state */
-  .field-error {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    color: #f87171;
-    letter-spacing: 1px;
-    margin-top: 6px;
-    display: none;
-  }
-
-  .field-group.has-error input,
-  .field-group.has-error select {
-    border-color: #f87171;
-  }
-
-  .field-group.has-error .field-error { display: block; }
 </style>
 </head>
 <body>
 
+<nav>
+  <a href="index.html" class="nav-logo">SRA <span>×</span> ESPORTS</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="players.html">Players</a>
+    <a href="signup.html" class="cta">Sign Up</a>
+  </div>
+</nav>
+
 <div class="container">
 
-  <!-- Header -->
-  <div class="header">
+  <div class="hero fade-up">
     <div class="presents-tag">Student Repair Academy Presents</div>
     <div class="main-title">
-      <div class="line1">END-OF-YEAR</div>
-      <div class="line2">TOURNAMENT</div>
-      <div class="line3">SIGN UP</div>
+      <span class="l1">END-OF-YEAR</span>
+      <span class="l2">TOURNAMENT</span>
+      <span class="l3">2025–26</span>
     </div>
     <div class="meta-row">
       <span class="badge badge-purple">Nintendo Switch 2</span>
       <span class="badge badge-outline">Info Commons</span>
       <span class="badge badge-outline">June 18 · 4th Period</span>
+      <span class="badge badge-outline">FCA Members Only</span>
     </div>
   </div>
 
-  <div class="divider"></div>
+  <div class="divider fade-up-2"></div>
 
-  <!-- Info Strip -->
-  <div class="info-strip">
+  <!-- Countdown -->
+  <div class="countdown-section fade-up-2">
+    <div class="countdown-label">Time Until Tournament</div>
+    <div class="countdown">
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-days">--</div>
+        <div class="countdown-unit-label">Days</div>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-hours">--</div>
+        <div class="countdown-unit-label">Hours</div>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-mins">--</div>
+        <div class="countdown-unit-label">Minutes</div>
+      </div>
+      <div class="countdown-unit">
+        <div class="countdown-num" id="cd-secs">--</div>
+        <div class="countdown-unit-label">Seconds</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info strip -->
+  <div class="info-grid fade-up-3">
     <div class="info-item">
       <div class="info-label">Date</div>
-      <div class="info-value">June 18</div>
+      <div class="info-value">June 18, 2026</div>
       <div class="info-sub">Final Week of School</div>
     </div>
     <div class="info-item">
-      <div class="info-label">Time</div>
-      <div class="info-value">1:41 PM</div>
-      <div class="info-sub">4th Period → Dismissal</div>
+      <div class="info-label">Time & Location</div>
+      <div class="info-value">Info Commons</div>
+      <div class="info-sub">1:41 PM → School Dismissal</div>
     </div>
     <div class="info-item">
-      <div class="info-label">Location</div>
-      <div class="info-value">Info Commons</div>
-      <div class="info-sub">FCA · Limited Spots</div>
+      <div class="info-label">Format</div>
+      <div class="info-value">Bracket</div>
+      <div class="info-sub">Single Elimination · Head-to-Head</div>
     </div>
   </div>
 
-  <!-- Form -->
-  <div class="form-card" id="formCard">
-    <div class="form-title">Register to Compete</div>
-
-    <div class="notice">
-      <strong>Eligibility:</strong> You must not be failing your 4th period class to participate. Signing up confirms you meet this requirement.
-    </div>
-
-    <div class="field-group" id="fg-name">
-      <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" name="entry.755733156" placeholder="First and Last Name" autocomplete="off">
-      <div class="field-error">Please enter your full name.</div>
-    </div>
-
-    <div class="field-group" id="fg-grade">
-      <label for="grade">Grade</label>
-      <div class="select-wrap">
-        <select id="grade" name="entry.1058867042">
-          <option value="" disabled selected>Select your grade</option>
-          <option value="9">9th Grade</option>
-          <option value="10">10th Grade</option>
-          <option value="11">11th Grade</option>
-          <option value="12">12th Grade</option>
-        </select>
-      </div>
-      <div class="field-error">Please select your grade.</div>
-    </div>
-
-    <div class="field-group" id="fg-teacher">
-      <label for="teacher">4th Period Class Teacher</label>
-      <input type="text" id="teacher" name="entry.528406179" placeholder="e.g. Mr. Smith" autocomplete="off">
-      <div class="field-error">Please enter your 4th period teacher.</div>
-    </div>
-
-    <div class="field-group" id="fg-game">
-      <label>Game Preference <span style="color:var(--muted);font-size:10px;letter-spacing:1px">(SELECT ALL THAT APPLY)</span></label>
-      <div class="checkbox-group">
-        <label class="checkbox-item">
-          <input type="checkbox" name="entry.562549117" value="Rocket League">
-          <span class="game-icon">🚗</span>
-          <span class="checkbox-label">Rocket League</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" name="entry.562549117" value="Overwatch">
-          <span class="game-icon">🎯</span>
-          <span class="checkbox-label">Overwatch</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" name="entry.562549117" value="Smash Bros">
-          <span class="game-icon">⚔️</span>
-          <span class="checkbox-label">Smash Bros</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" name="entry.562549117" value="Mario Kart">
-          <span class="game-icon">🏎️</span>
-          <span class="checkbox-label">Mario Kart</span>
-        </label>
-        <label class="checkbox-item" style="grid-column: span 2;">
-          <input type="checkbox" id="otherCheckbox" value="__other_option__" onchange="toggleOther(this)">
-          <span class="game-icon">✏️</span>
-          <span class="checkbox-label">Other</span>
-        </label>
-      </div>
-      <div id="otherInputWrap" style="display:none; margin-top:10px;">
-        <input type="text" id="otherGameInput" placeholder="What game would you like to play?" autocomplete="off">
-      </div>
-      <div class="field-error">Please select at least one game.</div>
-    </div>
-
-    <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
-      Lock In My Spot
-    </button>
-  </div>
-
-  <!-- Success -->
-  <div class="success-screen" id="successScreen">
-    <div class="success-icon">✓</div>
-    <div class="success-title">YOU'RE <span>IN</span></div>
-    <div class="success-body">
-      Your spot has been registered.<br>
-      Show up to the Info Commons on <strong style="color:var(--white)">June 18th during 4th period</strong>.<br><br>
-      Remember — you must be passing your 4th period class to compete.
+  <!-- Games -->
+  <div class="fade-up-3">
+    <div class="countdown-label" style="margin-bottom:14px">Games Being Played</div>
+    <div class="games-row">
+      <div class="game-tag">🚗 Rocket League</div>
+      <div class="game-tag">🎯 Overwatch</div>
+      <div class="game-tag">⚔️ Smash Bros <span class="pending">· Pending</span></div>
+      <div class="game-tag">🏎️ Mario Kart <span class="pending">· Pending</span></div>
     </div>
   </div>
 
-  <div class="footer">Student Repair Academy · Foundation Collegiate Academy · 2025–26</div>
+  <div class="divider fade-up-3"></div>
+
+  <!-- About cards -->
+  <div class="about-grid fade-up-3">
+    <div class="about-card">
+      <div class="about-card-title">Eligibility</div>
+      <p>Open to SRA and Esports League members who sign up. You must not be failing your 4th period class to participate.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-card-title">Equipment</div>
+      <p>5 Nintendo Switch 2 consoles provided by the Esports League. No personal equipment needed — just show up.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-card-title">Organized By</div>
+      <p>Student Repair Academy in collaboration with Foundation Collegiate Academy's Esports League.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-card-title">Spots</div>
+      <p>Limited spots available. Sign up early to guarantee your place. Registration closes before the event.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block fade-up-4">
+    <div class="left">
+      <h2>Ready to <span>Compete?</span></h2>
+      <p>Spots are limited — lock in your place before they fill up.</p>
+    </div>
+    <a href="signup.html" class="cta-btn">Sign Up Now</a>
+  </div>
+
 </div>
 
+<footer class="site-footer">
+  Student Repair Academy · Foundation Collegiate Academy Esports League · 2025–26
+</footer>
+
 <script>
-  const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLScf33ZatgCY6Ls4emtOC2WyzVorVgbDz8nIthLwFi98Kg5EnQ/formResponse";
+  // Countdown to June 18, 2026 1:41 PM
+  const target = new Date('2026-06-18T13:41:00');
 
-  function validate() {
-    let valid = true;
+  function updateCountdown() {
+    const now = new Date();
+    const diff = target - now;
 
-    const name = document.getElementById('fullName').value.trim();
-    const fg_name = document.getElementById('fg-name');
-    if (!name) { fg_name.classList.add('has-error'); valid = false; }
-    else fg_name.classList.remove('has-error');
-
-    const grade = document.getElementById('grade').value;
-    const fg_grade = document.getElementById('fg-grade');
-    if (!grade) { fg_grade.classList.add('has-error'); valid = false; }
-    else fg_grade.classList.remove('has-error');
-
-    const teacher = document.getElementById('teacher').value.trim();
-    const fg_teacher = document.getElementById('fg-teacher');
-    if (!teacher) { fg_teacher.classList.add('has-error'); valid = false; }
-    else fg_teacher.classList.remove('has-error');
-
-    const games = document.querySelectorAll('input[name="entry.562549117"]:checked');
-    const otherCb = document.getElementById('otherCheckbox');
-    const fg_game = document.getElementById('fg-game');
-    if (games.length === 0 && !otherCb.checked) { fg_game.classList.add('has-error'); valid = false; }
-    else fg_game.classList.remove('has-error');
-
-    return valid;
-  }
-
-  function toggleOther(cb) {
-    document.getElementById('otherInputWrap').style.display = cb.checked ? 'block' : 'none';
-  }
-
-  async function handleSubmit() {
-    if (!validate()) return;
-
-    const btn = document.getElementById('submitBtn');
-    btn.classList.add('loading');
-    btn.textContent = 'Submitting...';
-
-    const formData = new FormData();
-    formData.append('entry.755733156', document.getElementById('fullName').value.trim());
-    formData.append('entry.1058867042', document.getElementById('grade').value);
-    formData.append('entry.528406179', document.getElementById('teacher').value.trim());
-
-    const games = document.querySelectorAll('input[name="entry.562549117"]:checked');
-    games.forEach(g => formData.append('entry.562549117', g.value));
-
-    const otherChecked = document.getElementById('otherCheckbox').checked;
-    if (otherChecked) {
-      formData.append('entry.562549117', '__other_option__');
-      const otherText = document.getElementById('otherGameInput').value.trim();
-      if (otherText) formData.append('entry.562549117.other_option_response', otherText);
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '00';
+      document.getElementById('cd-hours').textContent = '00';
+      document.getElementById('cd-mins').textContent = '00';
+      document.getElementById('cd-secs').textContent = '00';
+      return;
     }
 
-    try {
-      await fetch(FORM_ACTION, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
-      });
-    } catch(e) {
-      // CORS error expected — submission still goes through
-    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-    document.getElementById('formCard').classList.add('hidden');
-    document.getElementById('successScreen').classList.add('show');
+    document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
   }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 </script>
 </body>
 </html>
